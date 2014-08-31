@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Main</title>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<!--
+Let's just redo the way we handle this -- drop one or more files, upload sequentially via ajax, get a reference to a file on the server back.
+Have the download link on the server remove the file after it's downloaded.  Also, have it check for stale files to remove (plus a cron job).
+Not great, but it gets around the weirdness in HTML and dropping a file into a file browser not accepting the file/filename (so it gets
+passed empty to the backend).
+-->
+<body>
+<div class="container-fluid">
+    <div id="header" class="row">
+        <div id="title" class="col-md-6">
+            <h1>RAR to ZIP converter</h1>
+        </div>
+    </div>
+    <div id="main" class="row">
+        <div id="instructions" class="col-md-2">
+            <h3>Instructions</h3>
+            <ol>
+                <li>Find the file to convert</li>
+                <li>Drag it into the converter box on the right</li>
+                <li>Save the converted file to your computer</li>
+            </ol>
+        </div>
+        <div id="converter" class="col-md-4">
+            <div id="converter-box" style="width: 100%; height: 100%; padding: 5%; border: dashed #285e8e; border-radius: 10px; background-color: #2aabd2;">
+                <span style="display: block; position: relative; top: 0px; left: 0px; width: 100%; height: 100%;">
+                    <form method="post" id="converter-form" action="convert" enctype="multipart/form-data">
+                        <input type="file" style="z-index: 2; opacity: 0;" name="file" id="converter-filename"/>
+                        <!--<br/>
+                        <input type="button" id="converter-button" onclick="convert_old_style();" value="Convert"/> -->
+                    </form>
+                </span>
+                <span style="pointer-events: none; display: block; position: relative; top: 0px; left: 0px; width: 100%; height: 100%; text-align: center; z-index: 1; color: #285e8e;" id="converter-target">
+                    Drop RAR files here!
+                </span>
+            </div>
+        </div>
+    </div>
+    <div id="footer" class="row">
+        <div id="disclaimer" class="col-md-6">
+            <p>
+                We promise to delete your uploaded and converted files immediately after the file is transferred to you.
+                Logging is minimal.  No inspection of the uploaded or converted files is performed beyond verification
+                of the structure, and no reading is performed expect what is necessary to un-RAR and create a ZIP file.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+<script src="static/js/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="static/js/bootstrap.min.js"></script>
+<!-- <script src="static/js/jquery.filedrop.js"></script> -->
+<script>
+    var target = document.getElementById("converter");
+    target.addEventListener("dragenter", dragenter, false);
+    target.addEventListener("dragover", dragover, false);
+    //target.addEventListener("drop", drop, false);
+    document.getElementById("converter-filename").addEventListener("drop", function() {
+        document.getElementById("converter-form").submit();
+    }, false);
+
+    function convert_old_style() {
+        return document.getElementById("converter-form").submit();
+    }
+
+    function dragenter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function dragover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+/*
+    function drop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+//        document.getElementById("converter-filename").value = e.dataTransfer.files;
+        var f = document.createElement("form");
+        f.method = "post";
+        f.action = "convert";
+        f.visible = false;
+        var field = document.createElement("input");
+        field.type = "file";
+        field.name = "file";
+        field.value = e.dataTransfer.files;
+        f.appendChild(field);
+        document.appendChild(f);
+        f.submit();
+        document.getElementById("converter-form").submit();
+    }
+/*
+    $("#converter").filedrop({
+        fallback_id: "converter-button",
+        url: "convert",
+        paramname: "file",
+        allowedfiletypes: [],   // filetypes allowed by Content-Type.  Empty array means no restrictions
+        allowedfileextensions: ['.rar'], // file extensions allowed. Empty array means no restrictions
+        maxfiles: 25,
+        maxfilesize: 256,    // max file size in MBs
+        error: function(err, file) {
+            switch(err) {
+                case 'BrowserNotSupported':
+                    alert('browser does not support HTML5 drag and drop')
+                    break;
+                case 'TooManyFiles':
+                    // user uploaded more than 'maxfiles'
+                    alert('Too many files');
+                    break;
+                case 'FileTooLarge':
+                    // program encountered a file whose size is greater than 'maxfilesize'
+                    // FileTooLarge also has access to the file which was too large
+                    // use file.name to reference the filename of the culprit file
+                    alert('Files too large');
+                    break;
+                case 'FileTypeNotAllowed':
+                    // The file type is not in the specified list 'allowedfiletypes'
+                    alert('File type not allowed');
+                    break;
+                case 'FileExtensionNotAllowed':
+                    // The file extension is not in the specified list 'allowedfileextensions'
+                    alert("File extension not allowed");
+                    break;
+                default:
+                    break;
+            }
+        },
+        uploadFinished: function(i, file, response, time) {
+            var iframe = document.createElement("iframe");
+            iframe.setAttribute("src", response.url);
+            iframe.setAttribute("style", "display: none");
+            //iframe.setAttribute("mimeType", success.contentType);
+            document.body.appendChild(iframe);
+        },
+    });
+    */
+</script>
+</body>
+</html>
